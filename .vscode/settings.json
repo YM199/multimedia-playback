@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "client.h": "c",
+        "stdint.h": "c",
+        "multicast.h": "c",
+        "types.h": "c",
+        "in.h": "c",
+        "stdio.h": "c",
+        "server.h": "c",
+        "inet.h": "c",
+        "signal.h": "c",
+        "errno.h": "c",
+        "fcntl.h": "c",
+        "stdlib.h": "c",
+        "stat.h": "c"
+    }
+}
