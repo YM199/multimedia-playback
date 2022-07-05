@@ -41,6 +41,11 @@ int sock_init(void)
     /*加入多播组*/
     if(setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)
         return -1;
+    
+    /*关闭回送到本地的回环接口*/
+    u_char flag = 0;
+    if(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &flag, sizeof(flag)) < 0)
+        return -1;
 
     return 0;
 }
