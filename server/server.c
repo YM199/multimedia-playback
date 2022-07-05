@@ -13,7 +13,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#define SONG_PATH "../../media/晴天.mp3"
+#define SONG_PATH "../../media/ch1/乱舞春秋.mp3"
 
 int sockfd;
 struct sockaddr_in dest_addr; /*目标IP*/
@@ -57,8 +57,9 @@ int main(int argc, char **argv)
     }
     if((fd = open(SONG_PATH, O_RDONLY)) < 0)
     {
-        exit(EXIT_FAILURE);
+        close(sockfd);
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
     }
 
     while(1)
@@ -82,6 +83,7 @@ int main(int argc, char **argv)
             }
         }
     }
-
+    close(sockfd);
+    close(fd);
     exit(EXIT_SUCCESS);
 }
