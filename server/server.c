@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "channel.h"
 #include <sys/stat.h>
 #include "multicast.h"
 #include <arpa/inet.h>
@@ -17,6 +18,9 @@
 
 int sockfd;
 struct sockaddr_in dest_addr; /*目标IP*/
+
+static struct Channel *list;
+
 
 /**
  * @brief 初始化多播
@@ -62,6 +66,9 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    mlib_getchnlist(&list);
+    printf("%d %s\n", list[0].chnid, list[0].desc);
+    printf("%d %s\n", list[1].chnid, list[1].desc);
     while(1)
     {
         wait_token();

@@ -12,6 +12,10 @@
         "errno.h": "c",
         "fcntl.h": "c",
         "stdlib.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "glob.h": "c",
+        "channel.h": "c",
+        "unistd.h": "c",
+        "string.h": "c"
     }
 }
