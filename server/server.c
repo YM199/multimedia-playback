@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "channel.h"
+#include "thr_list.h"
 #include <sys/stat.h>
 #include "multicast.h"
 #include <arpa/inet.h>
@@ -17,6 +18,7 @@
 #define SONG_PATH "../../media/ch1/乱舞春秋.mp3"
 
 int sockfd;
+int *psockfd = &sockfd;
 struct sockaddr_in dest_addr; /*目标IP*/
 
 /**
@@ -64,9 +66,12 @@ int main(int argc, char **argv)
     }
 
     fill_channel_array();
-    printf("%d %s\n", channel[0].chnid, channel[0].desc);
-    printf("%d %s\n", channel[1].chnid, channel[1].desc);
-    printf("%d %s\n", channel[2].chnid, channel[2].desc);
+    // printf("%d %s\n", channel[0].chnid, channel[0].desc);
+    // printf("%d %s\n", channel[1].chnid, channel[1].desc);
+    // printf("%d %s\n", channel[2].chnid, channel[2].desc);
+
+    thr_list_create(psockfd);
+
     while(1)
     {
         wait_token();

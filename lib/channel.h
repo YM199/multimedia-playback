@@ -15,14 +15,9 @@ struct Channel
 {
     chnid_t chnid; /*频道号*/
     char *desc; /*频道描述*/
-}__attribute__ ((packed));
+};
 
-/*节目单结构体*/
-struct List
-{
-    chnid_t chnid; /*频道号*/
-    struct Channel my_channel[0];
-}__attribute__ ((packed));
+
 
 extern struct Channel channel[CHANNEL_NUM+1];
 
