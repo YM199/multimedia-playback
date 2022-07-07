@@ -9,9 +9,15 @@
 #define PATHSIZE 1024
 #define LINEBUFSIZE 1024
 
-struct Channel channel[CHANNEL_NUM+1];
+struct Channel channel[CHANNEL_NUM+1]; /*频道结构体数组，包含节目单*/
 
-static struct Channel * path2entry(const char *path)
+/**
+ * @brief 填充频道结构体
+ * 
+ * @param path 频道的路径
+ * @return struct Channel* 
+ */
+static struct Channel * fill_channel(const char *path)
 {
     FILE *fp;
 
@@ -28,7 +34,7 @@ static struct Channel * path2entry(const char *path)
         return NULL;
 
     if(fgets(linebuf, LINEBUFSIZE, fp) == NULL)
-        
+        return NULL;
     
     fclose(fp);
 
@@ -42,11 +48,15 @@ static struct Channel * path2entry(const char *path)
     return me;
 }
 
-int mlib_getchnlist(struct Channel **result)
+/**
+ * @brief 填充频道结构体数组
+ * 
+ * @return int 
+ */
+int fill_channel_array(void)
 {   
     glob_t globres;
 
-    struct Channel *ptr;
     struct Channel *res;
 
     char path[PATHSIZE] = {0};
@@ -61,29 +71,18 @@ int mlib_getchnlist(struct Channel **result)
     if(glob(path, 0, NULL, &globres) != 0)
         return -1;
 
-    if((ptr = malloc(sizeof(struct Channel) * globres.gl_pathc)) == NULL)
-        perror("malloc\n");
+    channel[0].chnid  = 0;
+    channel[0].desc = "这是节目单频道";
 
     for(int i = 0; i < globres.gl_pathc; i++)
     {
-        if((res = path2entry(globres.gl_pathv[i])) != NULL)
+        if((res = fill_channel(globres.gl_pathv[i])) != NULL)
         {
             channel[res->chnid] = *res;
-            ptr[i].chnid = res->chnid;
-            ptr[i].desc = strdup(res->desc);
         }
     }
 
-    *result = ptr;
+    globfree(&globres);
 
     return 0;
-}
-
-
-
-
-
-void destory(void)
-{
-    //globfree(&gl);
 }

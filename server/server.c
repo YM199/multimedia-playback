@@ -19,9 +19,6 @@
 int sockfd;
 struct sockaddr_in dest_addr; /*目标IP*/
 
-static struct Channel *list;
-
-
 /**
  * @brief 初始化多播
  * 
@@ -66,9 +63,10 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    mlib_getchnlist(&list);
-    printf("%d %s\n", list[0].chnid, list[0].desc);
-    printf("%d %s\n", list[1].chnid, list[1].desc);
+    fill_channel_array();
+    printf("%d %s\n", channel[0].chnid, channel[0].desc);
+    printf("%d %s\n", channel[1].chnid, channel[1].desc);
+    printf("%d %s\n", channel[2].chnid, channel[2].desc);
     while(1)
     {
         wait_token();

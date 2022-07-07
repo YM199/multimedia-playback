@@ -8,6 +8,8 @@
 
 typedef uint8_t chnid_t;
 
+
+
 /*频道结构体*/
 struct Channel
 {
@@ -22,6 +24,8 @@ struct List
     struct Channel my_channel[0];
 }__attribute__ ((packed));
 
-int mlib_getchnlist(struct Channel **result);
+extern struct Channel channel[CHANNEL_NUM+1];
+
+int fill_channel_array(void);
 
 #endif
