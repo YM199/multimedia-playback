@@ -8,10 +8,10 @@ set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g -Wall")
 set(CMAKE_C_FLAGS_Release "${CMAKE_C_FLAGS_Release} -O3")
 
-file(GLOB USER_LIBS_PATH "../lib/*.c")
+file(GLOB USER_LIBS_PATH "./*.c")
 include_directories(../lib)
-message("USER_LIBS_PATH : ${USER_LIBS_PATH}")
-add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}.c ${USER_LIBS_PATH})
+#message("USER_LIBS_PATH : ${USER_LIBS_PATH}")
+add_executable(${CMAKE_PROJECT_NAME}  ${USER_LIBS_PATH})
 
 find_library(PTHREAD pthread)
 if(PTHREAD)

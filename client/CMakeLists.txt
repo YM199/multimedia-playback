@@ -8,7 +8,6 @@ set(CMAKE_BUILD_TYPE "Debug")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g -Wall")
 set(CMAKE_C_FLAGS_Release "${CMAKE_C_FLAGS_Release} -O3")
 
-file(GLOB USER_LIBS_PATH "../lib/*.c")
 include_directories(../lib)
 
 add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}.c ${USER_LIBS_PATH})

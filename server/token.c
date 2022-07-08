@@ -5,6 +5,7 @@
 #include <errno.h>
 #include "channel.h"
 #include <string.h>
+#include "multicast.h"
 
 
 struct Token token[CHANNEL_MAX];
