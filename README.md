@@ -15,3 +15,5 @@
 struct Channel channel[CHANNEL_NUM+1];的每一个成员都是 malloc 的。
 
 需要调用free释放
+
+clien.c中的    list_channel = (struct List_channel *)malloc(MSG_LIST_MAX); 记得free
