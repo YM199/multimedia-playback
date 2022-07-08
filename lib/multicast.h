@@ -13,6 +13,8 @@
 #define CHANNEL_NUM 2               /*频道数目(不包含节目单)*/
 #define CHANNEL_MAX (CHANNEL_NUM+1) /*频道数目(包含节目单)*/
 
+#define MSG_LIST_MAX (65536 -20 -8)
+
 typedef uint8_t chnid_t;
 
 /*

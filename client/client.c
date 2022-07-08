@@ -53,7 +53,10 @@ int main(int argc, char *argv[])
 {
     pid_t pid;
     int fd[2]; /*管道*/
-    uint8_t data[SIZE];
+    
+    struct List_channel *list_channel;
+    list_channel = (struct List_channel *)malloc(MSG_LIST_MAX);
+
 
     if(sock_init() < 0)
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
@@ -80,14 +83,27 @@ int main(int argc, char *argv[])
     }
     else /*父进程*/
     {
-        close(fd[0]);
+        // close(fd[0]);
+        // while(1)
+        // {
+        //     if(recvfrom(sockfd, data, sizeof(data), 0, NULL, NULL) < 0)
+        //     {
+        //         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        //     }
+        //     write(fd[1], data, sizeof(data));
+        // }
+        int len;
         while(1)
         {
-            if(recvfrom(sockfd, data, sizeof(data), 0, NULL, NULL) < 0)
+            struct List_channel *pos; 
+            len = recvfrom(sockfd, list_channel, MSG_LIST_MAX, 0, NULL, NULL);
+            for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + pos->len))
             {
-                fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+                printf("%d\n", pos->chnid);
+                printf("%d\n", pos->len);
+                printf("%s\n", pos->desc);
             }
-            write(fd[1], data, sizeof(data));
+            break;
         }
     }
     exit(EXIT_SUCCESS);

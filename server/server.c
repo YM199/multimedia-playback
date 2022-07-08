@@ -70,24 +70,24 @@ int main(int argc, char **argv)
     int size;
     while(1)
     {
-        size = get_token(1,SIZE);
-        len = pread(fd , data, size, offset);
-        if(len < 0)
-        {
-            fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-        }
-        else if(len == 0)
-        {
-            break; /*歌曲播放完毕*/
-        }
-        else
-        {
-            offset += sizeof(data);
-            if(sendto(sockse, data, sizeof(data), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
-            {
-                fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-            }
-        }
+        // size = get_token(1,SIZE);
+        // len = pread(fd , data, size, offset);
+        // if(len < 0)
+        // {
+        //     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        // }
+        // else if(len == 0)
+        // {
+        //     break; /*歌曲播放完毕*/
+        // }
+        // else
+        // {
+        //     offset += sizeof(data);
+        //     if(sendto(sockse, data, sizeof(data), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
+        //     {
+        //         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        //     }
+        // }
     }
     close(sockse);
     close(fd);

@@ -11,14 +11,15 @@
 #include <errno.h>
 
 struct List_channel *list_channel;
+int size =0;
 
 void *thr_handler(void *arg)
 {
-    // struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
-    // if(sendto(sockse, list_channel, sizeof(*list_channel), 0, (struct sockaddr *)dest_addr, sizeof(*dest_addr)) < 0)
-    // {
-    //     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-    // }
+    struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
+    if(sendto(sockse, list_channel, size, 0, (struct sockaddr *)dest_addr, sizeof(*dest_addr)) < 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+    }
     return NULL;
 }
 
@@ -30,7 +31,7 @@ void *thr_handler(void *arg)
  */
 int thr_list_create(struct sockaddr_in addr)
 {
-    int size =0;
+
     pthread_t tid;
     int len[CHANNEL_MAX];
 
