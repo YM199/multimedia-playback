@@ -1,6 +1,8 @@
 #ifndef __THR_LIST_H__
 #define __THR_LIST_H__
 
+
+#include <netinet/in.h>
 /*
  * 频道结构体
  * 可以用在网络传输
@@ -12,6 +14,6 @@ struct List_channel
     char desc[0];  /*频道描述*/
 }__attribute__ ((packed));
 
-int thr_list_create(int *sockfd);
+int thr_list_create(struct sockaddr_in addr);
 
 #endif

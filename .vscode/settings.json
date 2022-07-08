@@ -16,6 +16,7 @@
         "glob.h": "c",
         "channel.h": "c",
         "unistd.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "socket.h": "c"
     }
 }

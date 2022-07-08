@@ -17,8 +17,7 @@
 
 #define SONG_PATH "../../media/ch1/乱舞春秋.mp3"
 
-int sockfd;
-int *psockfd = &sockfd;
+int sockse;
 struct sockaddr_in dest_addr; /*目标IP*/
 
 /**
@@ -33,7 +32,7 @@ int sock_init(void)
     dest_addr.sin_addr.s_addr = inet_addr(MCAST_ADDR); /*目标地址就是多播地址*/
     dest_addr.sin_port = htons(SERVER_PORT);           /*多播服务器的端口*/
     
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    if ((sockse = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
         return -1;
     }
@@ -60,14 +59,14 @@ int main(int argc, char **argv)
     }
     if((fd = open(SONG_PATH, O_RDONLY)) < 0)
     {
-        close(sockfd);
+        close(sockse);
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     fill_channel_array();
 
-    thr_list_create(psockfd);
+    thr_list_create(dest_addr);
     int size;
     while(1)
     {
@@ -84,13 +83,13 @@ int main(int argc, char **argv)
         else
         {
             offset += sizeof(data);
-            if(sendto(sockfd, data, sizeof(data), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
+            if(sendto(sockse, data, sizeof(data), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
             {
                 fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
             }
         }
     }
-    close(sockfd);
+    close(sockse);
     close(fd);
     exit(EXIT_SUCCESS);
 }

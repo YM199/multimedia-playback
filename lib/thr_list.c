@@ -5,28 +5,30 @@
 #include <stdlib.h>
 #include "thr_list.h"
 #include <string.h>
+#include "../server/server.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <errno.h>
 
 struct List_channel *list_channel;
 
 void *thr_handler(void *arg)
 {
-    int sockfd = *((int *)arg);
-
-    while(1)
-    {
-        
-    }
-
+    // struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
+    // if(sendto(sockse, list_channel, sizeof(*list_channel), 0, (struct sockaddr *)dest_addr, sizeof(*dest_addr)) < 0)
+    // {
+    //     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+    // }
     return NULL;
 }
 
 /**
  * @brief 准备待发送的数据和创建线程
  * 
- * @param sockfd 套接字
+ * @param addr 套接字
  * @return int 
  */
-int thr_list_create(int *sockfd)
+int thr_list_create(struct sockaddr_in addr)
 {
     int size =0;
     pthread_t tid;
@@ -62,7 +64,7 @@ int thr_list_create(int *sockfd)
         ptr = (struct List_channel *)((char *)ptr + len[i]);
     }
     
-    if( pthread_create(&tid, NULL, thr_handler, (void *)sockfd) != 0)
+    if( pthread_create(&tid, NULL, thr_handler,(void *)&addr) != 0)
         return -1;
 
     return 0;
