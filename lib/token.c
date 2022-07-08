@@ -3,10 +3,12 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
+#include "channel.h"
 #include <string.h>
 
-static volatile int token = 0; /*令值*/
 
+struct Token token[CHANNEL_MAX];
+pthread_mutex_t token_mutex = PTHREAD_MUTEX_INITIALIZER;
 /**
  * @brief 更新令牌值
  * 
@@ -14,10 +16,46 @@ static volatile int token = 0; /*令值*/
  */
 void alarm_handler(int signal)
 {
-    token += CPS;
-    if(token > BURST)
-        token = BURST;
+    pthread_mutex_lock(&token_mutex);
+    for(int i = 0; i < CHANNEL_MAX; i++)
+    {
+        pthread_mutex_lock(&token[i].mutex);
+        token[i].num += token[i].cps;
+        if(token[i].num > token[i].burst)
+        {
+            token[i].num = token[i].burst;
+        }
+        pthread_cond_broadcast(&token[i].cond);
+        pthread_mutex_unlock(&token[i].mutex);
+    }
+    pthread_mutex_unlock(&token_mutex);
     alarm(1);
+}
+
+int get_token(int i,long size)
+{
+    pthread_mutex_lock(&token[i].mutex);
+    printf("%ld\n",token[i].num);
+    while(token[i].num <= 0)
+        pthread_cond_wait(&token[i].cond, &token[i].mutex);
+    printf("%ld\n",token[i].num);
+    int ret = (size < token[i].num ? size : token[i].num);
+    token[i].num -= ret;
+
+    pthread_mutex_unlock(&token[i].mutex);
+
+    return ret;
+}
+
+void return_token(int i, long size)
+{
+    pthread_mutex_lock(&token[i].mutex);
+    token[i].num += size;
+    if(token[i].num > token[i].burst)
+    {
+        token[i].num = token[i].burst;
+    }
+    pthread_mutex_unlock(&token[i].mutex);
 }
 
 /**
@@ -40,28 +78,33 @@ static int alarm_init(void)
 }
 
 /**
- * @brief 等待令牌值有效
- * 
- */
-void wait_token(void)
-{
-    while(token <= 0)
-        pause();
-    token -= SIZE;
-    if(token < 0)
-        token = 0;
-}
-
-/**
  * @brief 令牌初始化
  * 
  * @return int 
  */
 int token_init(void)
 {
+    for(int i = 0; i < CHANNEL_MAX; i++)
+    {
+        token[i].cps = CPS;
+        token[i].burst = BURST;
+        token[i].num = 0;
+        pthread_mutex_init(&token[i].mutex, NULL);
+        pthread_cond_init(&token[i].cond, NULL);
+    }
+
     if(alarm_init() < 0)
         return -1;
     alarm(1);
 
     return 0;
+}
+
+void token_destory(void)
+{
+    for(int i = 0; i < CHANNEL_MAX; i++)
+    {
+        pthread_mutex_destroy(&token[i].mutex);
+        pthread_cond_destroy(&token[i].cond);
+    }    
 }

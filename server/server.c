@@ -66,16 +66,13 @@ int main(int argc, char **argv)
     }
 
     fill_channel_array();
-    // printf("%d %s\n", channel[0].chnid, channel[0].desc);
-    // printf("%d %s\n", channel[1].chnid, channel[1].desc);
-    // printf("%d %s\n", channel[2].chnid, channel[2].desc);
 
     thr_list_create(psockfd);
-
+    int size;
     while(1)
     {
-        wait_token();
-        len = pread(fd , data, sizeof(data), offset);
+        size = get_token(1,SIZE);
+        len = pread(fd , data, size, offset);
         if(len < 0)
         {
             fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
