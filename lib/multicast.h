@@ -10,6 +10,20 @@
 #define CPS      SIZE               /*令牌值每秒累加值*/
 #define BURST    (SIZE*3)           /*令牌值上限*/
 
-void server_multicast(void);
-void client_multicast(void);
+#define CHANNEL_NUM 2               /*频道数目(不包含节目单)*/
+#define CHANNEL_MAX (CHANNEL_NUM+1) /*频道数目(包含节目单)*/
+
+typedef uint8_t chnid_t;
+
+/*
+ * 频道结构体
+ * 可以用在网络传输
+*/
+struct List_channel
+{
+    chnid_t chnid; /**频道号*/
+    int len;       /*结构体数组每个成员长度*/
+    char desc[0];  /*频道描述*/
+}__attribute__ ((packed));
+
 #endif
