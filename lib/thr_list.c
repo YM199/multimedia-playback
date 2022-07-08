@@ -20,16 +20,22 @@ void *thr_handler(void *arg)
     return NULL;
 }
 
+/**
+ * @brief 准备待发送的数据和创建线程
+ * 
+ * @param sockfd 套接字
+ * @return int 
+ */
 int thr_list_create(int *sockfd)
 {
     int size =0;
-    int len[CHANNEL_NUM+1];
+    pthread_t tid;
+    int len[CHANNEL_MAX];
 
-
-    for(int i = 0; i < CHANNEL_NUM + 1; i++)
+    for(int i = 0; i < CHANNEL_MAX; i++)
     {
-        size += strlen(channel[i].desc) + sizeof(chnid_t) + sizeof(int);
-        len[i] = strlen(channel[i].desc) + sizeof(chnid_t) + sizeof(int);
+        size += strlen(channel[i].desc) + sizeof(struct List_channel);
+        len[i] = strlen(channel[i].desc) + sizeof(struct List_channel);
     }
 
 
@@ -37,7 +43,7 @@ int thr_list_create(int *sockfd)
 
     struct List_channel *ptr = list_channel;
 
-    for(int i = 0; i < CHANNEL_NUM + 1; i++)
+    for(int i = 0; i < CHANNEL_MAX; i++)
     {
         ptr->chnid = channel[i].chnid;
         ptr->len = len[i];
@@ -47,7 +53,7 @@ int thr_list_create(int *sockfd)
 
     ptr = list_channel;
 
-    for(int i = 0; i < CHANNEL_NUM + 1; i++)
+    for(int i = 0; i < CHANNEL_MAX; i++)
     {
         printf("%d\n", ptr->chnid);
         printf("%d\n", ptr->len);
@@ -55,14 +61,9 @@ int thr_list_create(int *sockfd)
 
         ptr = (struct List_channel *)((char *)ptr + len[i]);
     }
-
-    pthread_t tid;
-    int ret;
-    ret = pthread_create(&tid, NULL, thr_handler, (void *)sockfd);
-    if( ret != 0)
-    {
-        perror("pthread_create");
-    }
+    
+    if( pthread_create(&tid, NULL, thr_handler, (void *)sockfd) != 0)
+        return -1;
 
     return 0;
 }

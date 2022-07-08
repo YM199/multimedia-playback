@@ -9,7 +9,7 @@
 #define PATHSIZE 1024
 #define LINEBUFSIZE 1024
 
-struct Channel channel[CHANNEL_NUM+1]; /*频道结构体数组，包含节目单*/
+struct Channel channel[CHANNEL_MAX]; /*频道结构体数组，包含节目单*/
 
 /**
  * @brief 填充频道结构体
@@ -61,7 +61,7 @@ int fill_channel_array(void)
 
     char path[PATHSIZE] = {0};
 
-    for(int i = 0; i < CHANNEL_NUM + 1; i++)
+    for(int i = 0; i < CHANNEL_MAX; i++)
     {
         channel[i].chnid = -1;
     }
