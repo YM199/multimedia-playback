@@ -18,6 +18,7 @@ struct Channel
 
 
 extern struct Channel channel[CHANNEL_MAX];
+extern struct Media_channel *media[CHANNEL_NUM];
 
 int fill_channel_array(void);
 

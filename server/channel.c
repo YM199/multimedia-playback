@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include "channel.h"
 #include <unistd.h>
 #include <string.h>
@@ -8,8 +9,12 @@
 
 #define PATHSIZE 1024
 #define LINEBUFSIZE 1024
+#define SONGPATHSIZE 1024
 
 struct Channel channel[CHANNEL_MAX]; /*频道结构体数组，包含节目单*/
+struct Media_channel *media[CHANNEL_NUM];
+
+extern struct sockaddr_in dest_addr;
 
 /**
  * @brief 填充频道结构体
@@ -48,6 +53,36 @@ static struct Channel * fill_channel(const char *path)
     return me;
 }
 
+struct Media_channel * fill_media_channel(const char *path)
+{
+    glob_t globres;
+
+    static chnid_t currid = 1;
+    struct Media_channel *me;
+
+
+
+    char songpath[SONGPATHSIZE];
+
+    strcpy(songpath, path);
+    strcat(songpath, "/*.mp3");
+
+    if(glob(songpath, 0, NULL, &globres) != 0)
+        return NULL;
+
+    if((me = malloc(sizeof(*me))) == NULL)
+        return NULL;
+
+    me->chnid = currid;
+    me->pos = 0;
+    me->fd = open(globres.gl_pathv[me->pos], O_RDONLY);
+    me->dest_addr = dest_addr;
+    me->globres = globres;
+    currid++;
+
+    return me;
+}
+
 /**
  * @brief 填充频道结构体数组
  * 
@@ -80,6 +115,7 @@ int fill_channel_array(void)
         {
             channel[res->chnid] = *res;
         }
+        media[i] = fill_media_channel(globres.gl_pathv[i]);
     }
 
     globfree(&globres);

@@ -1,6 +1,10 @@
 #ifndef __MULTICAST_H__
 #define __MULTICAST_H__
 
+#include <glob.h>
+#include <stdint.h>
+#include <netinet/in.h>
+
 #define MCAST_ADDR  "224.0.0.88"
 #define CLIENT_PORT 8000
 #define SERVER_PORT CLIENT_PORT
@@ -26,6 +30,18 @@ struct List_channel
     chnid_t chnid; /**频道号*/
     int len;       /*结构体数组每个成员长度*/
     char desc[0];  /*频道描述*/
+}__attribute__ ((packed));
+
+struct Media_channel
+{
+    chnid_t chnid; /**/
+    char data[SIZE];
+    
+    int fd;
+    int pos;
+    glob_t globres;
+    struct sockaddr_in dest_addr;
+    
 }__attribute__ ((packed));
 
 #endif

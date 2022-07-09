@@ -105,6 +105,17 @@ int main(int argc, char *argv[])
             }
             break;
         }
+        close(fd[0]);
+        struct Media_channel me;
+        while(1)
+        {
+            if(recvfrom(sockfd, &me, SIZE+sizeof(chnid_t), 0, NULL, NULL) < 0)
+            {
+                fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+            }
+            if(me.chnid == 1)
+                write(fd[1], me.data, sizeof(me.data));
+        }
     }
     exit(EXIT_SUCCESS);
 }

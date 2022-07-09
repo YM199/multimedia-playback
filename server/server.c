@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include "thr_channel.h"
 
 #define SONG_PATH "../../media/ch1/乱舞春秋.mp3"
 
@@ -67,7 +68,13 @@ int main(int argc, char **argv)
     fill_channel_array();
 
     thr_list_create(dest_addr);
-    int size;
+
+    for(int i = 0; i < CHANNEL_NUM; i++)
+    {
+
+        thr_channel_create(media);
+    }
+
     while(1)
     {
         // size = get_token(1,SIZE);

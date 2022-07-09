@@ -13,6 +13,7 @@
 struct List_channel *list_channel;
 int size =0;
 
+
 void *thr_handler(void *arg)
 {
     struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
@@ -58,10 +59,6 @@ int thr_list_create(struct sockaddr_in addr)
 
     for(int i = 0; i < CHANNEL_MAX; i++)
     {
-        printf("%d\n", ptr->chnid);
-        printf("%d\n", ptr->len);
-        printf("%s\n", ptr->desc);
-
         ptr = (struct List_channel *)((char *)ptr + len[i]);
     }
     

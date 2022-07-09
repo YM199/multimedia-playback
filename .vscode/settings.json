@@ -17,6 +17,8 @@
         "channel.h": "c",
         "unistd.h": "c",
         "string.h": "c",
-        "socket.h": "c"
+        "socket.h": "c",
+        "thr_channel.h": "c",
+        "thr_list.h": "c"
     }
 }
