@@ -8,8 +8,9 @@
 #include "multicast.h"
 
 
-struct Token token[CHANNEL_MAX];
+struct Token token[CHANNEL_MAX];/*每个频道对应一个单独使用的令牌*/
 pthread_mutex_t token_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 /**
  * @brief 更新令牌值
  * 
@@ -26,20 +27,25 @@ void alarm_handler(int signal)
         {
             token[i].num = token[i].burst;
         }
-        pthread_cond_broadcast(&token[i].cond);
+        pthread_cond_signal(&token[i].cond);
         pthread_mutex_unlock(&token[i].mutex);
     }
     pthread_mutex_unlock(&token_mutex);
     alarm(1);
 }
 
+/**
+ * @brief 获取令牌值
+ * 
+ * @param i 数组下标
+ * @param size 值的大小
+ * @return int 实际获取到的大小
+ */
 int get_token(int i,long size)
 {
     pthread_mutex_lock(&token[i].mutex);
-    printf("%ld\n",token[i].num);
     while(token[i].num <= 0)
         pthread_cond_wait(&token[i].cond, &token[i].mutex);
-    printf("%ld\n",token[i].num);
     int ret = (size < token[i].num ? size : token[i].num);
     token[i].num -= ret;
 
@@ -66,7 +72,7 @@ void return_token(int i, long size)
 }
 
 /**
- * @brief 数组SIGALRM信号的处理函数
+ * @brief 设置SIGALRM信号的处理函数
  * 
  * @return int 
  */

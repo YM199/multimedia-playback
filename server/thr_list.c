@@ -1,19 +1,24 @@
 #include <stdio.h>
-#include "channel.h"
+#include <errno.h>
 #include <string.h>
-#include <pthread.h>
 #include <stdlib.h>
-#include "thr_list.h"
 #include <string.h>
-#include "../server/server.h"
+#include "channel.h"
+#include <pthread.h>
+#include "thr_list.h"
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <errno.h>
+#include "../server/server.h"
 
-struct List_channel *list_channel;
+struct List_channel *list_channel; /*待发送的数据*/
 int size =0;
 
-
+/**
+ * @brief 发送节目单数据
+ * 
+ * @param arg 目的地的IP地址
+ * @return void* 
+ */
 void *thr_handler(void *arg)
 {
     struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
@@ -25,9 +30,9 @@ void *thr_handler(void *arg)
 }
 
 /**
- * @brief 准备待发送的数据和创建线程
+ * @brief 准备待发送的数据和创建节目单线程
  * 
- * @param addr 套接字
+ * @param addr IP地址
  * @return int 
  */
 int thr_list_create(struct sockaddr_in addr)
@@ -52,15 +57,12 @@ int thr_list_create(struct sockaddr_in addr)
         ptr->chnid = channel[i].chnid;
         ptr->len = len[i];
         strcpy(ptr->desc, channel[i].desc);
-        ptr = (struct List_channel *)((char *)ptr + len[i]);
+        ptr = (struct List_channel *)((char *)ptr + len[i]); /*必须是这种方式访问，因为是变长数组*/
     }
 
     ptr = list_channel;
-
     for(int i = 0; i < CHANNEL_MAX; i++)
-    {
         ptr = (struct List_channel *)((char *)ptr + len[i]);
-    }
     
     if( pthread_create(&tid, NULL, thr_handler,(void *)&addr) != 0)
         return -1;

@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include "multicast.h"
+
 int sockfd;
 
 /**
@@ -57,7 +58,6 @@ int main(int argc, char *argv[])
     struct List_channel *list_channel;
     list_channel = (struct List_channel *)malloc(MSG_LIST_MAX);
 
-
     if(sock_init() < 0)
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
 
@@ -83,15 +83,6 @@ int main(int argc, char *argv[])
     }
     else /*父进程*/
     {
-        // close(fd[0]);
-        // while(1)
-        // {
-        //     if(recvfrom(sockfd, data, sizeof(data), 0, NULL, NULL) < 0)
-        //     {
-        //         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-        //     }
-        //     write(fd[1], data, sizeof(data));
-        // }
         int len;
         while(1)
         {
@@ -99,12 +90,11 @@ int main(int argc, char *argv[])
             len = recvfrom(sockfd, list_channel, MSG_LIST_MAX, 0, NULL, NULL);
             for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + pos->len))
             {
-                printf("%d\n", pos->chnid);
-                printf("%d\n", pos->len);
-                printf("%s\n", pos->desc);
+                printf("频道号: %d 频道介绍: %s\n", pos->chnid, pos->desc);
             }
             break;
         }
+
         close(fd[0]);
         struct Media_channel me;
         while(1)
@@ -114,7 +104,10 @@ int main(int argc, char *argv[])
                 fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
             }
             if(me.chnid == 1)
-                write(fd[1], me.data, sizeof(me.data));
+            {
+                if(write(fd[1], me.data, sizeof(me.data)) < 0)
+                    fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+            }
         }
     }
     exit(EXIT_SUCCESS);

@@ -3,8 +3,7 @@
 
 #include <pthread.h>
 
-
-
+/*令牌*/
 struct Token
 {
     long cps;    /*令牌值每秒累加值*/
