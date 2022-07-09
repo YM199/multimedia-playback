@@ -34,9 +34,7 @@ int sock_init(void)
     dest_addr.sin_port = htons(SERVER_PORT);           /*多播服务器的端口*/
     
     if ((sockse = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
         return -1;
-    }
 
     return 0;
 }
@@ -65,36 +63,25 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    fill_channel_array();
+    if(fill_channel_array() < 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
-    thr_list_create(dest_addr);
+    if(thr_list_create(dest_addr) < 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);        
+    }
 
     for(int i = 0; i < CHANNEL_NUM; i++)
     {
-
         thr_channel_create(media);
     }
 
     while(1)
     {
-        // size = get_token(1,SIZE);
-        // len = pread(fd , data, size, offset);
-        // if(len < 0)
-        // {
-        //     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-        // }
-        // else if(len == 0)
-        // {
-        //     break; /*歌曲播放完毕*/
-        // }
-        // else
-        // {
-        //     offset += sizeof(data);
-        //     if(sendto(sockse, data, sizeof(data), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
-        //     {
-        //         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-        //     }
-        // }
     }
     close(sockse);
     close(fd);

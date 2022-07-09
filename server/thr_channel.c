@@ -1,11 +1,18 @@
-#include "thr_channel.h"
-#include "server.h"
-#include <pthread.h>
+#include "token.h"
 #include <stdio.h>
 #include <errno.h>
+#include "server.h"
 #include <string.h>
 #include <unistd.h>
-#include "token.h"
+#include <pthread.h>
+#include "thr_channel.h"
+
+/**
+ * @brief 发送歌曲数据
+ * 
+ * @param arg 媒体频道结构体
+ * @return void* 
+ */
 void *thr_channel_handle(void *arg)
 {
     struct Media_channel *me = (struct Media_channel *)arg;
@@ -37,13 +44,20 @@ void *thr_channel_handle(void *arg)
     }
 }
 
+/**
+ * @brief 创建频道线程
+ * 
+ * @param arg 媒体频道结构体数组
+ * @return int 
+ */
 int thr_channel_create(struct Media_channel **arg)
 {
     int ret;
     pthread_t tid;
     static int i = 0;
 
-    ret = pthread_create(&tid, NULL, thr_channel_handle, arg[i]);
+    if(ret = pthread_create(&tid, NULL, thr_channel_handle, arg[i]) != 0)
+        return -1;
     i++;
 
     return 0;

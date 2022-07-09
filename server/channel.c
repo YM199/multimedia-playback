@@ -1,18 +1,16 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <fcntl.h>
-#include "channel.h"
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "channel.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define PATHSIZE 1024
-#define LINEBUFSIZE 1024
-#define SONGPATHSIZE 1024
+#define BUFSIZE 1024
 
-struct Channel channel[CHANNEL_MAX]; /*频道结构体数组，包含节目单*/
-struct Media_channel *media[CHANNEL_NUM];
+struct Channel channel[CHANNEL_MAX];      /*频道结构体数组，包含节目单*/
+struct Media_channel *media[CHANNEL_NUM]; /*频道结构体数组，不包含节目单，用来网络传输*/
 
 extern struct sockaddr_in dest_addr;
 
@@ -20,17 +18,15 @@ extern struct sockaddr_in dest_addr;
  * @brief 填充频道结构体
  * 
  * @param path 频道的路径
- * @return struct Channel* 
+ * @return struct Channel* 返回值是malloc的，需要free
  */
 static struct Channel * fill_channel(const char *path)
 {
     FILE *fp;
-
     struct Channel * me;
     static chnid_t currid = 1;
-
-    char pathstr[LINEBUFSIZE] = {0};
-    char linebuf[LINEBUFSIZE] = {0};
+    char pathstr[BUFSIZE] = {0};
+    char linebuf[BUFSIZE] = {0};
 
     strcpy(pathstr, path);
     strcat(pathstr, "/desc.txt");
@@ -38,7 +34,7 @@ static struct Channel * fill_channel(const char *path)
     if((fp = fopen(pathstr, "r")) == NULL)
         return NULL;
 
-    if(fgets(linebuf, LINEBUFSIZE, fp) == NULL)
+    if(fgets(linebuf, BUFSIZE, fp) == NULL)
         return NULL;
     
     fclose(fp);
@@ -53,16 +49,18 @@ static struct Channel * fill_channel(const char *path)
     return me;
 }
 
+/**
+ * @brief 填充 Media_channel 结构体
+ * 
+ * @param path 频道路径
+ * @return struct Media_channel* 返回值是malloc的，需要free
+ */
 struct Media_channel * fill_media_channel(const char *path)
 {
     glob_t globres;
-
     static chnid_t currid = 1;
     struct Media_channel *me;
-
-
-
-    char songpath[SONGPATHSIZE];
+    char songpath[BUFSIZE] = {0};
 
     strcpy(songpath, path);
     strcat(songpath, "/*.mp3");
@@ -84,22 +82,15 @@ struct Media_channel * fill_media_channel(const char *path)
 }
 
 /**
- * @brief 填充频道结构体数组
+ * @brief 填充频道结构体数组：channel和media
  * 
  * @return int 
  */
 int fill_channel_array(void)
 {   
     glob_t globres;
-
     struct Channel *res;
-
-    char path[PATHSIZE] = {0};
-
-    for(int i = 0; i < CHANNEL_MAX; i++)
-    {
-        channel[i].chnid = -1;
-    }
+    char path[BUFSIZE] = {0};
 
     strcpy(path,"../../media/*");
 
