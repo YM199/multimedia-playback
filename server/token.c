@@ -48,6 +48,12 @@ int get_token(int i,long size)
     return ret;
 }
 
+/**
+ * @brief 归还令牌值
+ * 
+ * @param i 数组小标
+ * @param size 值的大小
+ */
 void return_token(int i, long size)
 {
     pthread_mutex_lock(&token[i].mutex);

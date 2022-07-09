@@ -24,9 +24,14 @@ void *thr_channel_handle(void *arg)
     {
         size = get_token(me->chnid,SIZE);
         len = pread(me->fd , me->data, size, offset);
+        if(size > len)
+        {
+            return_token(me->chnid, size - len);
+        }
         if(len < 0)
         {
             fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+            break;
         }
         else if(len == 0)
         {
@@ -34,12 +39,11 @@ void *thr_channel_handle(void *arg)
         }
         else
         {
-            offset += sizeof(me->data);
+            offset += len;
             if(sendto(sockse, me, SIZE+sizeof(chnid_t), 0, (struct sockaddr *)&addr, sizeof(addr)) < 0)
             {
                 fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
             }
-            printf("%d\n\n", me->data[50]);
         }
     }
 }
