@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,9 +23,13 @@ int size =0;
 void *thr_handler(void *arg)
 {
     struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
-    if(sendto(sockse, list_channel, size, 0, (struct sockaddr *)dest_addr, sizeof(*dest_addr)) < 0)
+    while(1)
     {
-        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        if(sendto(sockse, list_channel, size, 0, (struct sockaddr *)dest_addr, sizeof(*dest_addr)) < 0)
+        {
+            fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        }
+        sleep(1);
     }
     return NULL;
 }

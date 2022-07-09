@@ -57,10 +57,17 @@ int main(int argc, char *argv[])
     
     struct List_channel *list_channel;
     list_channel = (struct List_channel *)malloc(MSG_LIST_MAX);
+    if(list_channel == NULL)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);        
+    }
 
     if(sock_init() < 0)
+    {
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-
+        exit(EXIT_FAILURE);
+    }
     if(pipe(fd) < 0)
     {
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
@@ -84,28 +91,23 @@ int main(int argc, char *argv[])
     else /*父进程*/
     {
         int len;
-        while(1)
-        {
-            struct List_channel *pos; 
-            len = recvfrom(sockfd, list_channel, MSG_LIST_MAX, 0, NULL, NULL);
-            for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + pos->len))
-            {
-                printf("频道号: %d 频道介绍: %s\n", pos->chnid, pos->desc);
-            }
-            break;
-        }
-
+        struct List_channel *pos;
         close(fd[0]);
-        struct Media_channel me;
         while(1)
         {
-            if(recvfrom(sockfd, &me, SIZE+sizeof(chnid_t), 0, NULL, NULL) < 0)
+            memset(list_channel, 0, MSG_LIST_MAX); 
+            len = recvfrom(sockfd, list_channel, MSG_LIST_MAX, 0, NULL, NULL);
+            if(list_channel->chnid == 0)
             {
-                fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+                for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + pos->len))
+                {
+                    printf("频道号: %d 频道介绍: %s\n", pos->chnid, pos->desc);
+                }
             }
-            if(me.chnid == 1)
+            else if(list_channel->chnid == 1)
             {
-                if(write(fd[1], me.data, sizeof(me.data)) < 0)
+                struct Media_channel *me = (struct Media_channel *)list_channel;
+                if(write(fd[1], me->data, sizeof(me->data)) < 0)
                     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
             }
         }
