@@ -93,18 +93,22 @@ int main(int argc, char *argv[])
         int len;
         struct List_channel *pos;
         close(fd[0]);
+        char flag = 0;
+        int chnid;
         while(1)
         {
             memset(list_channel, 0, MSG_LIST_MAX); 
             len = recvfrom(sockfd, list_channel, MSG_LIST_MAX, 0, NULL, NULL);
-            if(list_channel->chnid == 0)
+            if(flag == 0 && list_channel->chnid == 0)
             {
+                flag = 1;
                 for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + pos->len))
-                {
-                    printf("频道号: %d 频道介绍: %s\n", pos->chnid, pos->desc);
-                }
+                    fprintf(stdout,"频道号: %d 频道介绍: %s\n", pos->chnid, pos->desc);
+                fprintf(stdout,"请选择播放的频道:");
+                chnid = fgetc(stdin);
+                chnid = chnid - '0';
             }
-            else if(list_channel->chnid == 1)
+            if(flag ==1 && list_channel->chnid == chnid)
             {
                 struct Media_channel *me = (struct Media_channel *)list_channel;
                 if(write(fd[1], me->data, sizeof(me->data)) < 0)
