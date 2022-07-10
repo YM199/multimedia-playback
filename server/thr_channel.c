@@ -7,6 +7,25 @@
 #include <pthread.h>
 #include "thr_channel.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int next_song(struct Media_channel *me)
+{
+    close(me->fd);
+    me->pos++;
+
+    if(me->pos >= me->globres.gl_pathc)
+        me->pos = 0;
+
+    if((me->fd = open(me->globres.gl_pathv[me->pos], O_RDONLY)) < 0)
+        return -1;
+
+    return 0;
+}
+
+
 /**
  * @brief 发送歌曲数据
  * 
@@ -31,11 +50,12 @@ void *thr_channel_handle(void *arg)
         if(len < 0)
         {
             fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-            break;
+            continue;
         }
         else if(len == 0)
         {
-            break; /*歌曲播放完毕*/
+            next_song(me);
+            offset = 0;
         }
         else
         {

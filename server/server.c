@@ -16,8 +16,6 @@
 #include <sys/socket.h>
 #include "thr_channel.h"
 
-#define SONG_PATH "../../media/ch1/乱舞春秋.mp3"
-
 int sockse;
 struct sockaddr_in dest_addr; /*目标IP*/
 
@@ -41,11 +39,6 @@ int sock_init(void)
 
 int main(int argc, char **argv)
 {
-    int fd;
-    int len;
-    int offset = 0;
-    uint8_t data[SIZE];
-
     if(sock_init() < 0)
     {
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
@@ -53,12 +46,6 @@ int main(int argc, char **argv)
     }
     if(token_init() < 0)
     {
-        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-    if((fd = open(SONG_PATH, O_RDONLY)) < 0)
-    {
-        close(sockse);
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
@@ -84,6 +71,5 @@ int main(int argc, char **argv)
     {
     }
     close(sockse);
-    close(fd);
     exit(EXIT_SUCCESS);
 }
