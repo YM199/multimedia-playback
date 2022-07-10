@@ -28,7 +28,7 @@ typedef uint8_t chnid_t;
 struct List_channel
 {
     chnid_t chnid;                   /*频道号*/
-    int len;                         /*结构体数组每个成员长度*/
+    uint16_t len;                    /*结构体数组每个成员长度*/
     char desc[0];                    /*频道描述*/
 }__attribute__ ((packed));
 

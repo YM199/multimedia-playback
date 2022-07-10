@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
             if(flag == 0 && list_channel->chnid == 0)
             {
                 flag = 1;
-                for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + pos->len))
+                for(pos = list_channel; (char *)pos < ((char *)list_channel + len); pos = (struct List_channel *)((char *)pos + ntohs(pos->len)))
                     fprintf(stdout,"频道号: %d 频道介绍: %s\n", pos->chnid, pos->desc);
                 fprintf(stdout,"请选择播放的频道:");
                 chnid = fgetc(stdin);

@@ -44,7 +44,7 @@ int thr_list_create(struct sockaddr_in addr)
 {
 
     pthread_t tid;
-    int len[CHANNEL_MAX];
+    uint16_t len[CHANNEL_MAX];
 
     for(int i = 0; i < CHANNEL_MAX; i++)
     {
@@ -60,7 +60,7 @@ int thr_list_create(struct sockaddr_in addr)
     for(int i = 0; i < CHANNEL_MAX; i++)
     {
         ptr->chnid = channel[i].chnid;
-        ptr->len = len[i];
+        ptr->len = htons(len[i]);
         strcpy(ptr->desc, channel[i].desc);
         ptr = (struct List_channel *)((char *)ptr + len[i]); /*必须是这种方式访问，因为是变长数组*/
     }
