@@ -8,15 +8,15 @@
 #include "channel.h"
 #include "multicast.h"
 
-struct Token *token;/*每个频道对应一个单独使用的令牌*/
-pthread_mutex_t token_mutex = PTHREAD_MUTEX_INITIALIZER;
+static struct Token *token;/*每个频道对应一个单独使用的令牌*/
+static pthread_mutex_t token_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
  * @brief 更新令牌值
  * 
  * @param signal 
  */
-void alarm_handler(int signal)
+static void alarm_handler(int signal)
 {
     pthread_mutex_lock(&token_mutex);
     for(int i = 0; i < channel_max; i++)
@@ -91,6 +91,22 @@ static int alarm_init(void)
 }
 
 /**
+ * @brief 清理函数
+ * 
+ */
+static void token_destory(void)
+{
+    for(int i = 0; i < channel_max; i++)
+    {
+        pthread_mutex_destroy(&token[i].mutex);
+        pthread_cond_destroy(&token[i].cond);
+    }
+
+    free(token);    
+}
+
+
+/**
  * @brief 令牌初始化
  * 
  * @return int 
@@ -114,14 +130,8 @@ int token_init(void)
         return -1;
     alarm(1);
 
-    return 0;
-}
+    if(atexit(token_destory) != 0)
+        return -1;
 
-void token_destory(void)
-{
-    for(int i = 0; i < channel_max; i++)
-    {
-        pthread_mutex_destroy(&token[i].mutex);
-        pthread_cond_destroy(&token[i].cond);
-    }    
+    return 0;
 }

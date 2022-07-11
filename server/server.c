@@ -25,7 +25,7 @@ struct sockaddr_in dest_addr; /*目标IP*/
  * 
  * @return int 
  */
-int sock_init(void)
+static int sock_init(void)
 {
     memset(&dest_addr, 0,sizeof(dest_addr));
     dest_addr.sin_family = AF_INET;
@@ -66,6 +66,14 @@ static int sigint_init(void)
     return 0;
 }
 
+/**
+ * @brief 清理函数
+ * 
+ */
+void socket_destroy(void)
+{
+    close(sockse);
+}
 
 int main(int argc, char **argv)
 {
@@ -81,6 +89,11 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    if(atexit(socket_destroy) != 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);        
+    }
 
     if(fill_channel_array() < 0)
     {
@@ -109,10 +122,7 @@ int main(int argc, char **argv)
     {
         thr_channel_create(media);
     }
-
-    while(1)
-    {
-    }
-    close(sockse);
+        
+    while(1);
     exit(EXIT_SUCCESS);
 }

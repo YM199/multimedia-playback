@@ -11,8 +11,8 @@
 #include <sys/socket.h>
 #include "../server/server.h"
 
-struct List_channel *list_channel; /*待发送的数据*/
-int size =0;
+static struct List_channel *list_channel; /*待发送的数据*/
+static int size =0;
 
 /**
  * @brief 发送节目单数据
@@ -20,7 +20,7 @@ int size =0;
  * @param arg 目的地的IP地址
  * @return void* 
  */
-void *thr_handler(void *arg)
+static void *thr_handler(void *arg)
 {
     struct sockaddr_in *dest_addr = (struct sockaddr_in *)arg;
     while(1)
@@ -32,6 +32,11 @@ void *thr_handler(void *arg)
         sleep(1);
     }
     return NULL;
+}
+
+static void thr_list_destroy(void)
+{
+    free(list_channel);
 }
 
 /**
@@ -70,6 +75,9 @@ int thr_list_create(struct sockaddr_in addr)
         ptr = (struct List_channel *)((char *)ptr + len[i]);
     
     if( pthread_create(&tid, NULL, thr_handler,(void *)&addr) != 0)
+        return -1;
+
+    if(atexit(thr_list_destroy) != 0)
         return -1;
 
     return 0;

@@ -1,17 +1,16 @@
 #include "token.h"
+#include <fcntl.h>
 #include <stdio.h>
 #include <errno.h>
 #include "server.h"
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "thr_channel.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-int next_song(struct Media_channel *me)
+static int next_song(struct Media_channel *me)
 {
     close(me->fd);
     me->pos++;
@@ -25,14 +24,13 @@ int next_song(struct Media_channel *me)
     return 0;
 }
 
-
 /**
  * @brief 发送歌曲数据
  * 
  * @param arg 媒体频道结构体
  * @return void* 
  */
-void *thr_channel_handle(void *arg)
+static void *thr_channel_handle(void *arg)
 {
     struct Media_channel *me = (struct Media_channel *)arg;
     struct sockaddr_in addr = me->dest_addr;

@@ -58,7 +58,7 @@ static struct Channel * fill_channel(const char *path)
  * @param path 频道路径
  * @return struct Media_channel* 返回值是malloc的，需要free
  */
-struct Media_channel * fill_media_channel(const char *path)
+static struct Media_channel * fill_media_channel(const char *path)
 {
     glob_t globres;
     static chnid_t currid = 1;
@@ -83,6 +83,23 @@ struct Media_channel * fill_media_channel(const char *path)
 
     return me;
 }
+
+/**
+ * @brief 清理函数
+ * 
+ */
+static void channel_destroy(void)
+{
+    free(channel);
+    for(int i = 0; i < channel_num; i++)
+    {
+        glob_t temp = media[i]->globres;
+        globfree(&temp);
+        free(media[i]);
+    }
+    free(media);
+}
+
 
 /**
  * @brief 填充频道结构体数组：channel和media
@@ -124,5 +141,10 @@ int fill_channel_array(void)
 
     globfree(&globres);
 
+    if(atexit(channel_destroy) != 0)
+        return -1;
+
     return 0;
 }
+
+

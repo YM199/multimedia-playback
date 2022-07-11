@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -13,14 +14,15 @@
 #include <sys/socket.h>
 #include "multicast.h"
 
-int sockfd;
+static int sockfd;
+static struct List_channel *list_channel;
 
 /**
  * @brief 初始化多播
  * 
  * @return int 
  */
-int sock_init(void)
+static int sock_init(void)
 {
     struct ip_mreq mreq;
 
@@ -50,12 +52,48 @@ int sock_init(void)
     return 0;
 }
 
+/**
+ * @brief SIGINT信号的处理函数
+ * 
+ * @param signal 
+ */
+static void sigint_handler(int signal)
+{
+    printf("客户端已退出\n");
+    close(sockfd);
+    free(list_channel);
+    /*TODO:父子进程的管道没关闭*/
+    exit(EXIT_SUCCESS);
+}
+
+/**
+ * @brief 设置SIGINT 信号
+ * 
+ * @return int 
+ */
+static int sigint_init(void)
+{
+    struct sigaction sa;
+    sa.sa_handler = sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if(sigaction(SIGINT, &sa, NULL) < 0)
+        return -1;
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     pid_t pid;
     int fd[2]; /*管道*/
-    
-    struct List_channel *list_channel;
+
+    if(sigint_init() < 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);           
+    }
+
     list_channel = (struct List_channel *)malloc(MSG_LIST_MAX);
     if(list_channel == NULL)
     {
@@ -108,11 +146,9 @@ int main(int argc, char *argv[])
                 chnid = fgetc(stdin);
                 chnid = chnid - '0';
             }
-            printf("chnid:%d\n", chnid);
-            printf("list_channel->chnid:%d\n", list_channel->chnid);
+
             if(flag ==1 && list_channel->chnid == chnid)
             {
-                printf("%d\n", list_channel->chnid);
                 struct Media_channel *me = (struct Media_channel *)list_channel;
                 if(write(fd[1], me->data, sizeof(me->data)) < 0)
                     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
