@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <signal.h>
 #include "channel.h"
 #include "thr_list.h"
 #include <sys/stat.h>
@@ -37,8 +38,43 @@ int sock_init(void)
     return 0;
 }
 
+/**
+ * @brief SIGINT信号的处理函数
+ * 
+ * @param signal 
+ */
+static void sigint_handler(int signal)
+{
+    printf("服务器已退出\n");
+    exit(EXIT_SUCCESS);
+}
+
+/**
+ * @brief 设置SIGINT 信号
+ * 
+ * @return int 
+ */
+static int sigint_init(void)
+{
+    struct sigaction sa;
+    sa.sa_handler = sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if(sigaction(SIGINT, &sa, NULL) < 0)
+        return -1;
+
+    return 0;
+}
+
+
 int main(int argc, char **argv)
 {
+    if(sigint_init() < 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);        
+    }
+
     if(sock_init() < 0)
     {
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
