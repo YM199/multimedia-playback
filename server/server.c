@@ -44,11 +44,7 @@ int main(int argc, char **argv)
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);
     }
-    if(token_init() < 0)
-    {
-        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+
 
     if(fill_channel_array() < 0)
     {
@@ -56,13 +52,24 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    /*
+     * token_init的调用一定要放在fill_channel_array之后
+     * 因为fill_channel_array 给channel_num和channel_max赋值
+    */
+    if(token_init() < 0)
+    {
+        fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+
     if(thr_list_create(dest_addr) < 0)
     {
         fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));
         exit(EXIT_FAILURE);        
     }
 
-    for(int i = 0; i < CHANNEL_NUM; i++)
+    for(int i = 0; i < channel_num; i++)
     {
         thr_channel_create(media);
     }

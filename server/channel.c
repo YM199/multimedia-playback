@@ -9,8 +9,11 @@
 
 #define BUFSIZE 1024
 
-struct Channel channel[CHANNEL_MAX];      /*频道结构体数组，包含节目单*/
-struct Media_channel *media[CHANNEL_NUM]; /*频道结构体数组，不包含节目单，用来网络传输*/
+int channel_num = 0; /*频道数目(不包含节目单)*/
+int channel_max = 0; /*频道数目(包含节目单)*/
+
+struct Channel *channel;      /*频道结构体数组，包含节目单*/
+struct Media_channel **media; /*频道结构体数组，不包含节目单，用来网络传输*/
 
 extern struct sockaddr_in dest_addr;
 
@@ -97,10 +100,20 @@ int fill_channel_array(void)
     if(glob(path, 0, NULL, &globres) != 0)
         return -1;
 
+    channel_num = globres.gl_pathc;
+    channel_max = channel_num +1;
+
+    channel = (struct Channel *)malloc(sizeof(struct Channel) * channel_max);
+    media = (struct Media_channel **)malloc(sizeof(struct Media_channel *) * channel_num);
+    for(int i = 0; i < channel_num; i++)
+    {
+        media[i] = (struct Media_channel *)malloc(sizeof(struct Media_channel));
+    }
+
     channel[0].chnid  = 0;
     channel[0].desc = "这是节目单频道";
 
-    for(int i = 0; i < globres.gl_pathc; i++)
+    for(int i = 0; i < channel_num; i++)
     {
         if((res = fill_channel(globres.gl_pathv[i])) != NULL)
         {

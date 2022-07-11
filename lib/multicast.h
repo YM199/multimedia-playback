@@ -14,9 +14,6 @@
 #define CPS      SIZE                /*令牌值每秒累加值*/
 #define BURST    (SIZE*3)            /*令牌值上限*/
 
-#define CHANNEL_NUM 2                /*频道数目(不包含节目单)*/
-#define CHANNEL_MAX (CHANNEL_NUM+1)  /*频道数目(包含节目单)*/
-
 #define MSG_LIST_MAX (65536 -20 -8)   /*最大UPD报的大小，20:IP包报头, 8:UDP包报头*/
 
 typedef uint8_t chnid_t;

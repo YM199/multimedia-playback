@@ -108,8 +108,11 @@ int main(int argc, char *argv[])
                 chnid = fgetc(stdin);
                 chnid = chnid - '0';
             }
+            printf("chnid:%d\n", chnid);
+            printf("list_channel->chnid:%d\n", list_channel->chnid);
             if(flag ==1 && list_channel->chnid == chnid)
             {
+                printf("%d\n", list_channel->chnid);
                 struct Media_channel *me = (struct Media_channel *)list_channel;
                 if(write(fd[1], me->data, sizeof(me->data)) < 0)
                     fprintf(stderr, " %s %d %s\n",__FILE__, __LINE__, strerror(errno));

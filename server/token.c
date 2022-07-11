@@ -1,14 +1,14 @@
 #include "token.h"
-#include <signal.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#include "channel.h"
 #include <string.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+#include "channel.h"
 #include "multicast.h"
 
-
-struct Token token[CHANNEL_MAX];/*每个频道对应一个单独使用的令牌*/
+struct Token *token;/*每个频道对应一个单独使用的令牌*/
 pthread_mutex_t token_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /**
@@ -19,7 +19,7 @@ pthread_mutex_t token_mutex = PTHREAD_MUTEX_INITIALIZER;
 void alarm_handler(int signal)
 {
     pthread_mutex_lock(&token_mutex);
-    for(int i = 0; i < CHANNEL_MAX; i++)
+    for(int i = 0; i < channel_max; i++)
     {
         pthread_mutex_lock(&token[i].mutex);
         token[i].num += token[i].cps;
@@ -97,7 +97,11 @@ static int alarm_init(void)
  */
 int token_init(void)
 {
-    for(int i = 0; i < CHANNEL_MAX; i++)
+    token = (struct Token *)malloc(sizeof(struct Token) * channel_max);
+    if(token == NULL)
+        return -1;
+    
+    for(int i = 0; i < channel_max; i++)
     {
         token[i].cps = CPS;
         token[i].burst = BURST;
@@ -115,7 +119,7 @@ int token_init(void)
 
 void token_destory(void)
 {
-    for(int i = 0; i < CHANNEL_MAX; i++)
+    for(int i = 0; i < channel_max; i++)
     {
         pthread_mutex_destroy(&token[i].mutex);
         pthread_cond_destroy(&token[i].cond);

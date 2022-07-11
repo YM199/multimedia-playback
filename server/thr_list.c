@@ -44,9 +44,9 @@ int thr_list_create(struct sockaddr_in addr)
 {
 
     pthread_t tid;
-    uint16_t len[CHANNEL_MAX];
+    uint16_t len[channel_max];
 
-    for(int i = 0; i < CHANNEL_MAX; i++)
+    for(int i = 0; i < channel_max; i++)
     {
         size += strlen(channel[i].desc) + sizeof(struct List_channel);
         len[i] = strlen(channel[i].desc) + sizeof(struct List_channel);
@@ -57,7 +57,7 @@ int thr_list_create(struct sockaddr_in addr)
 
     struct List_channel *ptr = list_channel;
 
-    for(int i = 0; i < CHANNEL_MAX; i++)
+    for(int i = 0; i < channel_max; i++)
     {
         ptr->chnid = channel[i].chnid;
         ptr->len = htons(len[i]);
@@ -66,7 +66,7 @@ int thr_list_create(struct sockaddr_in addr)
     }
 
     ptr = list_channel;
-    for(int i = 0; i < CHANNEL_MAX; i++)
+    for(int i = 0; i < channel_max; i++)
         ptr = (struct List_channel *)((char *)ptr + len[i]);
     
     if( pthread_create(&tid, NULL, thr_handler,(void *)&addr) != 0)

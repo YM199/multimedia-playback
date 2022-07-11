@@ -16,8 +16,11 @@ struct Channel
     char *desc; /*频道描述*/
 };
 
-extern struct Channel channel[CHANNEL_MAX];
-extern struct Media_channel *media[CHANNEL_NUM];
+extern struct Channel *channel;
+extern struct Media_channel **media;
+
+extern int channel_num;
+extern int channel_max;
 
 int fill_channel_array(void);
 
